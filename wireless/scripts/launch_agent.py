@@ -3,10 +3,12 @@
 Licensed under the BSD 3 Clause license
 SPDX-License-Identifier: BSD-3-Clause
 """
+
 import gym
 import json
 
 from sacred import Experiment
+from sacred.observers import MongoObserver
 
 from wireless.agents.bosch_agent import BoschAgent
 from wireless.agents.time_freq_resource_allocation_v0.round_robin_agent import *
