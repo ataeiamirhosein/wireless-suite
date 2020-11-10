@@ -33,7 +33,7 @@ def run_episode(e, env, agent, save_snr=False):
     while True:
         # Take a step
         action = agent.act(state)
-        next_state, reward, _ = env.step(action)
+        next_state, reward, done, _ = env.step(action)
 
         # Collect progress
         if save_snr:
@@ -70,9 +70,8 @@ with open('../../config/config_sacred.json') as f:
     ex = Experiment(ac["agent"]["agent_type"], save_git_info=False)
     ex.add_config(sc)
     ex.add_config(ac)
-mongo_db_url = f'mongodb://{sc["sacred"]["sacred_user"]}:{sc["sacred"]["sacred_pwd"]}@' + \
-               f'{sc["sacred"]["sacred_host"]}:{sc["sacred"]["sacred_port"]}/{sc["sacred"]["sacred_db"]}'
-# ex.observers.append(MongoObserver(url=mongo_db_url, db_name=sc["sacred"]["sacred_db"]))  # Uncomment to save to DB
+mongo_db_url = f'mongodb://{sc["sacred"]["sacred_user"]}:{sc["sacred"]["sacred_pwd"]}@' + f'{sc["sacred"]["sacred_host"]}:{sc["sacred"]["sacred_port"]}/{sc["sacred"]["sacred_db"]}'
+ex.observers.append(MongoObserver(url=mongo_db_url, db_name=sc["sacred"]["sacred_db"]))  # Uncomment to save to DB
 
 # Load environment parameters
 with open('../../config/config_environment.json') as f:
@@ -90,7 +89,6 @@ def main(_run):
     run_n_episodes(num_episodes, env, agent, _run.config['seed'])
 
     # Plot results
-    plt.figure()
     fig, ax1 = plt.subplots()
     ax2 = ax1.twinx()
     ax1.plot(range(num_episodes), episode_rewards, 'g-')
