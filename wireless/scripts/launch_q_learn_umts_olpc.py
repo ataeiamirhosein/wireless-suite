@@ -33,7 +33,7 @@ def run_episode(e, env, agent, save_snr=False):
     while True:
         # Take a step
         action = agent.act(state)
-        next_state, reward, done, _ = env.step(action)
+        next_state, reward, _ = env.step(action)
 
         # Collect progress
         if save_snr:
