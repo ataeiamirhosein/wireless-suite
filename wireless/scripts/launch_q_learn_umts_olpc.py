@@ -42,7 +42,7 @@ def run_episode(e, env, agent, save_snr=False):
         agent.td_update(state, action, next_state, reward)
         agent.exploration_rate_update()
         s += 1
-        if done:
+        if s == num_episodes:
             break
         state = next_state
 
