@@ -2,9 +2,10 @@ import gym
 import json
 import numpy as np
 import matplotlib.pyplot as plt
+
 from collections import defaultdict
 from sacred import Experiment
-
+from sacred.observers import MongoObserver
 from wireless.agents.q_learning import QLearningAgent
 
 
