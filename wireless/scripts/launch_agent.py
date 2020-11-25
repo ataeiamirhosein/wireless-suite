@@ -3,12 +3,10 @@
 Licensed under the BSD 3 Clause license
 SPDX-License-Identifier: BSD-3-Clause
 """
-
 import gym
 import json
 
 from sacred import Experiment
-from sacred.observers import MongoObserver
 
 from wireless.agents.bosch_agent import BoschAgent
 from wireless.agents.time_freq_resource_allocation_v0.round_robin_agent import *
@@ -26,8 +24,9 @@ with open('../../config/config_sacred.json') as f:
     ex = Experiment(ac["agent"]["agent_type"], save_git_info=False)
     ex.add_config(sc)
     ex.add_config(ac)
-mongo_db_url = f'mongodb://{sc["sacred"]["sacred_user"]}:{sc["sacred"]["sacred_pwd"]}@' + f'{sc["sacred"]["sacred_host"]}:{sc["sacred"]["sacred_port"]}/{sc["sacred"]["sacred_db"]}'
-ex.observers.append(MongoObserver(url=mongo_db_url, db_name=sc["sacred"]["sacred_db"]))  # Uncomment to save to DB
+mongo_db_url = f'mongodb://{sc["sacred"]["sacred_user"]}:{sc["sacred"]["sacred_pwd"]}@' +\
+               f'{sc["sacred"]["sacred_host"]}:{sc["sacred"]["sacred_port"]}/{sc["sacred"]["sacred_db"]}'
+# ex.observers.append(MongoObserver(url=mongo_db_url, db_name=sc["sacred"]["sacred_db"]))  # Uncomment to save to DB
 
 # Load environment parameters
 with open('../../config/config_environment.json') as f:

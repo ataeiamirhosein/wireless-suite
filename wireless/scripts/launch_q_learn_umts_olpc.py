@@ -1,17 +1,10 @@
-"""
-© 2020 Nokia
-Licensed under the BSD 3 Clause license
-SPDX-License-Identifier: BSD-3-Clause
-"""
-
 import gym
 import json
 import numpy as np
 import matplotlib.pyplot as plt
-
 from collections import defaultdict
 from sacred import Experiment
-from sacred.observers import MongoObserver
+
 from wireless.agents.q_learning import QLearningAgent
 
 
@@ -42,7 +35,7 @@ def run_episode(e, env, agent, save_snr=False):
         agent.td_update(state, action, next_state, reward)
         agent.exploration_rate_update()
         s += 1
-        if s == num_episodes:
+        if done:
             break
         state = next_state
 
@@ -70,8 +63,9 @@ with open('../../config/config_sacred.json') as f:
     ex = Experiment(ac["agent"]["agent_type"], save_git_info=False)
     ex.add_config(sc)
     ex.add_config(ac)
-mongo_db_url = f'mongodb://{sc["sacred"]["sacred_user"]}:{sc["sacred"]["sacred_pwd"]}@' + f'{sc["sacred"]["sacred_host"]}:{sc["sacred"]["sacred_port"]}/{sc["sacred"]["sacred_db"]}'
-ex.observers.append(MongoObserver(url=mongo_db_url, db_name=sc["sacred"]["sacred_db"]))  # Uncomment to save to DB
+mongo_db_url = f'mongodb://{sc["sacred"]["sacred_user"]}:{sc["sacred"]["sacred_pwd"]}@' + \
+               f'{sc["sacred"]["sacred_host"]}:{sc["sacred"]["sacred_port"]}/{sc["sacred"]["sacred_db"]}'
+# ex.observers.append(MongoObserver(url=mongo_db_url, db_name=sc["sacred"]["sacred_db"]))  # Uncomment to save to DB
 
 # Load environment parameters
 with open('../../config/config_environment.json') as f:
@@ -82,13 +76,14 @@ with open('../../config/config_environment.json') as f:
 @ex.automain
 def main(_run):
     env = gym.make('UlOpenLoopPowerControl-v0', f_carrier_mhz=_run.config['env']['f_carrier_mhz'],
-                   t_max=_run.config['agent']['t_max'])  # Init environment
+                   t_max=max_steps_per_episode)  # Init environment
 
     agent = QLearningAgent(seed=_run.config['seed'], num_actions=env.action_space.n)
 
     run_n_episodes(num_episodes, env, agent, _run.config['seed'])
 
     # Plot results
+    plt.figure()
     fig, ax1 = plt.subplots()
     ax2 = ax1.twinx()
     ax1.plot(range(num_episodes), episode_rewards, 'g-')
